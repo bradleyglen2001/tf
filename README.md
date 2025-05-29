@@ -1,1 +1,1 @@
-This is a minimalist timer and stopwatch html app called Tempus Foogit.
+This is a minimalist timer and stopwatch html app available for use at https://www.hurryclock.com/
