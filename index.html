@@ -214,9 +214,60 @@
             timeDisplay.textContent = formatTime(elapsedTime, true);
             editHint.classList.add('show');
             
-            // Focus on the display to capture keyboard input
+            // Create or show hidden input for mobile keyboard
+            if (!document.getElementById('hiddenInput')) {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.id = 'hiddenInput';
+                hiddenInput.type = 'tel'; // Use tel to get numeric keypad on mobile
+                hiddenInput.style.position = 'absolute';
+                hiddenInput.style.left = '-9999px';
+                hiddenInput.style.opacity = '0';
+                hiddenInput.style.pointerEvents = 'none';
+                hiddenInput.inputMode = 'numeric';
+                document.body.appendChild(hiddenInput);
+                
+                // Handle input from hidden field
+                hiddenInput.addEventListener('input', (e) => {
+                    if (isEditing) {
+                        const value = e.target.value;
+                        const lastChar = value.slice(-1);
+                        if (lastChar >= '0' && lastChar <= '9') {
+                            processEditInput(lastChar);
+                        }
+                        // Clear the input to prevent issues
+                        setTimeout(() => { e.target.value = ''; }, 0);
+                    }
+                });
+                
+                // Handle backspace and enter
+                hiddenInput.addEventListener('keydown', (e) => {
+                    if (isEditing) {
+                        if (e.key === 'Backspace') {
+                            e.preventDefault();
+                            editBuffer = editBuffer.slice(0, -1);
+                            if (editBuffer === '') {
+                                elapsedTime = 0;
+                                originalTimerValue = 0;
+                            } else {
+                                processEditInput('');
+                            }
+                        } else if (e.key === 'Enter') {
+                            e.preventDefault();
+                            exitEditMode();
+                            if (isTimer && elapsedTime > 0) {
+                                startBtn.click();
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Focus on hidden input to trigger mobile keyboard
+            const hiddenInput = document.getElementById('hiddenInput');
+            hiddenInput.focus();
+            
+            // Also set tabindex on display for desktop
             timeDisplay.setAttribute('tabindex', '0');
-            timeDisplay.focus();
         }
 
         function exitEditMode() {
@@ -226,6 +277,13 @@
             timeDisplay.classList.remove('editing');
             editHint.classList.remove('show');
             timeDisplay.removeAttribute('tabindex');
+            
+            // Hide mobile keyboard by blurring hidden input
+            const hiddenInput = document.getElementById('hiddenInput');
+            if (hiddenInput) {
+                hiddenInput.blur();
+            }
+            
             updateDisplay();
         }
 
