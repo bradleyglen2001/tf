@@ -1,1 +1,1 @@
-This is a minimalist timer and stopwatch html app available for use at https://www.hurryclock.com/
+This micro app is a timer and stopwatch. 1 page with no dependenccies. App hosted at https://www.hurryclock.com/.
