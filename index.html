@@ -119,6 +119,29 @@
         .edit-hint.show {
             opacity: 1;
         }
+                .citation {
+            position: fixed;
+            bottom: 10px;
+            right: 15px;
+            font-size: 10px;
+            color: #999;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .citation:hover {
+            opacity: 1;
+        }
+
+        .citation a {
+            color: #999;
+            text-decoration: none;
+        }
+
+        .citation a:hover {
+            color: #666;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -140,6 +163,10 @@
             <button id="add3">+3m</button>
             <button id="add5">+5m</button>
         </div>
+    </div>
+
+    <div class="citation">
+        Brought to you by <a href="https://www.linkedin.com/in/bganderson/" target="_blank">Brad Anderson</a>
     </div>
 
     <script>
