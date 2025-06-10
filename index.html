@@ -89,10 +89,27 @@
             cursor: not-allowed;
         }
 
-        .mode-toggle {
-            font-size: 12px;
-            padding: 5px 10px;
+        .mode-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
             margin-bottom: 10px;
+        }
+
+        .mode-buttons button {
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 15px;
+            min-width: 80px;
+        }
+
+        .mode-buttons button.active {
+            background: #f9f9f9;
+            color: #999999;
+        }
+
+        .mode-buttons button.active:hover {
+            background: #f0f0f0;
         }
 
         .quick-add {
@@ -101,6 +118,12 @@
             gap: 5px;
             margin-top: 5px;
             scale: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .quick-add.hidden {
+            visibility: hidden;
+            pointer-events: none;
         }
 
         .quick-add button {
@@ -157,7 +180,12 @@
             <button id="stop" disabled>Stop</button>
             <button id="reset">Reset</button>
         </div>
-        <button class="mode-toggle" id="modeToggle">Timer Mode</button>
+        
+        <div class="mode-buttons">
+            <button id="timerBtn" class="active">Timer</button>
+            <button id="stopwatchBtn">Stopwatch</button>
+        </div>
+        
         <div class="quick-add">
             <button id="add1">+1m</button>
             <button id="add3">+3m</button>
@@ -182,12 +210,14 @@
         const startBtn = document.getElementById('start');
         const stopBtn = document.getElementById('stop');
         const resetBtn = document.getElementById('reset');
-        const modeToggle = document.getElementById('modeToggle');
+        const timerBtn = document.getElementById('timerBtn');
+        const stopwatchBtn = document.getElementById('stopwatchBtn');
         const add1Btn = document.getElementById('add1');
         const add3Btn = document.getElementById('add3');
         const add5Btn = document.getElementById('add5');
         const display = document.getElementById('display');
         const editHint = document.getElementById('editHint');
+        const quickAddContainer = document.querySelector('.quick-add');
 
         function formatTime(milliseconds, isEditMode = false) {
             const totalSeconds = Math.floor(milliseconds / 1000);
@@ -339,9 +369,23 @@
             timeDisplay.textContent = formatTime(elapsedTime, true);
         }
 
-        function toggleMode() {
-            isTimer = !isTimer;
-            modeToggle.textContent = isTimer ? 'Timer Mode' : 'Stopwatch Mode';
+        function setTimerMode() {
+            if (isRunning) return; // Don't allow mode change while running
+            
+            isTimer = true;
+            timerBtn.classList.add('active');
+            stopwatchBtn.classList.remove('active');
+            quickAddContainer.classList.remove('hidden');
+            reset();
+        }
+
+        function setStopwatchMode() {
+            if (isRunning) return; // Don't allow mode change while running
+            
+            isTimer = false;
+            timerBtn.classList.remove('active');
+            stopwatchBtn.classList.add('active');
+            quickAddContainer.classList.add('hidden');
             reset();
         }
 
@@ -457,7 +501,8 @@
         });
 
         resetBtn.addEventListener('click', reset);
-        modeToggle.addEventListener('click', toggleMode);
+        timerBtn.addEventListener('click', setTimerMode);
+        stopwatchBtn.addEventListener('click', setStopwatchMode);
 
         add1Btn.addEventListener('click', () => addTime(1));
         add3Btn.addEventListener('click', () => addTime(3));
