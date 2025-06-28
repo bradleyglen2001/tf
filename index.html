@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Timer</title>
+    <title>HurryClock.com A Simple Time</title>
     <style>
         * {
             margin: 0;
@@ -17,9 +17,9 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: #ffffff;
-            color: #333333;
-            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #212529;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .container {
@@ -33,91 +33,192 @@
             font-size: clamp(80px, 25vw, 220px);
             letter-spacing: 2px;
             margin: 5vh 0 3vh 0;
-            font-family: 'Arial', sans-serif;
-            color: #333333;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            color: #212529;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-weight: bold;
+            font-weight: 600;
             transition: color 0.5s ease;
             cursor: pointer;
         }
 
         #display:hover {
-            background: rgba(0, 0, 0, 0.02);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
         }
 
         .time-display {
-            padding: 10px;
-            border-radius: 10px;
-            transition: background 0.2s ease;
+            padding: 16px 24px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
         }
 
         .editing {
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
         }
 
+        /* Button Base Styles */
+        .btn {
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            min-height: 44px;
+        }
+
+        .btn:before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: subtract;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover:before {
+            opacity: 1;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Primary Buttons (Play/Stop) */
+        .btn-primary {
+            background: rgba(108, 117, 125, 0.15);
+            color: #495057;
+            font-size: 20px;
+            padding: 16px 32px;
+            min-width: 120px;
+            border-radius: 60px;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            background: rgba(108, 117, 125, 0.25);
+            color: #212529;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary.stop-state {
+            background: rgba(73, 80, 87, 0.2);
+            color: #343a40;
+            border-color: rgba(73, 80, 87, 0.25);
+        }
+
+        .btn-primary.stop-state:hover {
+            background: rgba(73, 80, 87, 0.3);
+            color: #212529;
+        }
+
+        /* Secondary Buttons (Reset) */
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.4);
+            color: #6c757d;
+            font-size: 18px;
+            padding: 12px 24px;
+            min-width: 80px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.6);
+            color: #495057;
+            transform: translateY(-0.5px);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* Mode Toggle Buttons */
+        .btn-toggle {
+            background: rgba(255, 255, 255, 0.3);
+            color: #868e96;
+            font-size: 14px;
+            padding: 8px 20px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-toggle.active {
+            background: rgba(108, 117, 125, 0.15);
+            color: #495057;
+            border-color: rgba(108, 117, 125, 0.1);
+        }
+
+        .btn-toggle:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.5);
+            color: #6c757d;
+        }
+
+        /* Quick Add Buttons */
+        .btn-quick {
+            background: rgba(255, 255, 255, 0.3);
+            color: #868e96;
+            font-size: 12px;
+            padding: 6px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+        }
+
+        .btn-quick:hover {
+            background: rgba(255, 255, 255, 0.5);
+            color: #6c757d;
+            transform: translateY(-0.5px);
+        }
+
+        /* Layout Containers */
         .controls {
             display: flex;
-            gap: 10px;
+            gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 10px;
-            scale: 0.8;
-        }
-
-        button {
-            font-size: 14px;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            background: #f0f0f0;
-            color: #333333;
-            transition: all 0.2s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        button:hover {
-            background: #e0e0e0;
-        }
-
-        button:disabled {
-            background: #f9f9f9;
-            color: #999999;
-            cursor: not-allowed;
+            margin-bottom: 20px;
         }
 
         .mode-buttons {
             display: flex;
             justify-content: center;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-
-        .mode-buttons button {
-            font-size: 12px;
-            padding: 6px 12px;
-            border-radius: 15px;
-            min-width: 80px;
-        }
-
-        .mode-buttons button.active {
-            background: #f9f9f9;
-            color: #999999;
-        }
-
-        .mode-buttons button.active:hover {
-            background: #f0f0f0;
+            gap: 8px;
+            margin-bottom: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            display: inline-flex;
+            border: 1px solid rgba(0, 0, 0, 0.03);
         }
 
         .quick-add {
             display: flex;
             justify-content: center;
-            gap: 5px;
-            margin-top: 5px;
-            scale: 0.7;
+            gap: 8px;
+            margin-top: 12px;
             transition: opacity 0.3s ease;
         }
 
@@ -126,30 +227,36 @@
             pointer-events: none;
         }
 
-        .quick-add button {
-            font-size: 12px;
-            padding: 5px 10px;
-        }
-
         .edit-hint {
             font-size: 14px;
-            color: #666;
-            margin-top: 10px;
+            color: #868e96;
+            margin-top: 16px;
             opacity: 0;
             transition: opacity 0.3s ease;
+            background: rgba(255, 255, 255, 0.4);
+            padding: 12px 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            display: inline-block;
+            border: 1px solid rgba(0, 0, 0, 0.03);
         }
 
         .edit-hint.show {
             opacity: 1;
         }
-                .citation {
+
+        .citation {
             position: fixed;
-            bottom: 10px;
-            right: 15px;
-            font-size: 10px;
-            color: #999;
+            bottom: 16px;
+            right: 20px;
+            font-size: 11px;
+            color: #adb5bd;
             opacity: 0.7;
             transition: opacity 0.2s ease;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px 12px;
+            border-radius: 6px;
+            backdrop-filter: blur(10px);
         }
 
         .citation:hover {
@@ -157,39 +264,76 @@
         }
 
         .citation a {
-            color: #999;
+            color: inherit;
             text-decoration: none;
         }
 
         .citation a:hover {
-            color: #666;
             text-decoration: underline;
+        }
+
+        /* Icon improvements */
+        .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .controls {
+                gap: 12px;
+            }
+            
+            .btn-primary {
+                font-size: 18px;
+                padding: 14px 28px;
+                min-width: 100px;
+            }
+            
+            .btn-secondary {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+        }
+
+        /* Animation for timer countdown */
+        .urgent {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="display" style="color: rgb(51, 51, 51);">
+        <div id="display" style="color: rgb(33, 37, 41);">
             <div class="time-display" id="timeDisplay">5:00</div>
         </div>
         
         <div class="edit-hint" id="editHint">Click the time to edit. Enter numbers from right: 10=10sec, 1000=10min, 100000=10hr</div>
         
         <div class="controls">
-            <button id="start">Start</button>
-            <button id="stop" disabled>Stop</button>
-            <button id="reset">Reset</button>
+            <button id="playStopBtn" class="btn btn-primary">
+                <span class="icon">▶</span>
+            </button>
+            <button id="reset" class="btn btn-secondary">
+                <span class="icon">↻</span>
+            </button>
         </div>
         
         <div class="mode-buttons">
-            <button id="timerBtn" class="active">Timer</button>
-            <button id="stopwatchBtn">Stopwatch</button>
+            <button id="timerBtn" class="btn btn-toggle active">Timer</button>
+            <button id="stopwatchBtn" class="btn btn-toggle">Stopwatch</button>
         </div>
         
         <div class="quick-add">
-            <button id="add1">+1m</button>
-            <button id="add3">+3m</button>
-            <button id="add5">+5m</button>
+            <button id="add1" class="btn btn-quick">+1m</button>
+            <button id="add3" class="btn btn-quick">+3m</button>
+            <button id="add5" class="btn btn-quick">+5m</button>
         </div>
     </div>
 
@@ -207,8 +351,7 @@
         let editBuffer = '';
         
         const timeDisplay = document.getElementById('timeDisplay');
-        const startBtn = document.getElementById('start');
-        const stopBtn = document.getElementById('stop');
+        const playStopBtn = document.getElementById('playStopBtn');
         const resetBtn = document.getElementById('reset');
         const timerBtn = document.getElementById('timerBtn');
         const stopwatchBtn = document.getElementById('stopwatchBtn');
@@ -246,19 +389,36 @@
             
             timeDisplay.textContent = formatTime(elapsedTime);
             
-            // Change display color based on remaining time
+            // Change display color and add urgency animation
             if (isTimer && isRunning) {
                 const totalSeconds = Math.floor(elapsedTime / 1000);
                 
                 if (totalSeconds <= 30) {
-                    display.style.color = '#ff3333';
+                    display.style.color = '#000000';
+                    display.classList.add('urgent');
                 } else if (totalSeconds <= 120) {
-                    display.style.color = '#ff9933';
+                    display.style.color = '#495057';
+                    display.classList.remove('urgent');
                 } else {
-                    display.style.color = '#333333';
+                    display.style.color = '#212529';
+                    display.classList.remove('urgent');
                 }
             } else {
-                display.style.color = '#333333';
+                display.style.color = '#212529';
+                display.classList.remove('urgent');
+            }
+        }
+
+        function updatePlayStopButton() {
+            const icon = playStopBtn.querySelector('.icon');
+            if (isRunning) {
+                icon.textContent = '■';
+                playStopBtn.classList.add('stop-state');
+                playStopBtn.disabled = false;
+            } else {
+                icon.textContent = '▶';
+                playStopBtn.classList.remove('stop-state');
+                playStopBtn.disabled = false;
             }
         }
 
@@ -312,7 +472,7 @@
                             e.preventDefault();
                             exitEditMode();
                             if (isTimer && elapsedTime > 0) {
-                                startBtn.click();
+                                playStopBtn.click();
                             }
                         }
                     }
@@ -395,17 +555,15 @@
             exitEditMode();
             
             if (isTimer) {
-                elapsedTime = 5 * 60 * 1000; // Reset to 5 minutes
-                originalTimerValue = elapsedTime;
+                // Reset to the last configured time instead of default 5 minutes
+                elapsedTime = originalTimerValue;
             } else {
                 elapsedTime = 0;
             }
             
             updateDisplay();
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-            resetBtn.disabled = false;
-            display.style.color = '#333333';
+            updatePlayStopButton();
+            display.style.color = '#212529';
         }
 
         function addTime(minutes) {
@@ -414,6 +572,51 @@
                 originalTimerValue = elapsedTime;
                 updateDisplay();
             }
+        }
+
+        function togglePlayStop() {
+            exitEditMode();
+            
+            if (isRunning) {
+                // Stop the timer/stopwatch
+                clearInterval(interval);
+                isRunning = false;
+            } else {
+                // Start the timer/stopwatch
+                if (isTimer) {
+                    if (elapsedTime <= 0) {
+                        alert('Please set a timer duration');
+                        return;
+                    }
+                }
+                
+                isRunning = true;
+                interval = setInterval(() => {
+                    elapsedTime += isTimer ? -1000 : 1000;
+                    
+                    if (isTimer && elapsedTime <= 0) {
+                        elapsedTime = 0;
+                        clearInterval(interval);
+                        isRunning = false;
+                        updatePlayStopButton();
+                        
+                        // Flash the display
+                        let flashCount = 0;
+                        const flashInterval = setInterval(() => {
+                            display.style.color = display.style.color === '#000000' ? '#212529' : '#000000';
+                            flashCount++;
+                            if (flashCount >= 6) {
+                                clearInterval(flashInterval);
+                                display.style.color = '#212529';
+                            }
+                        }, 300);
+                    }
+                    
+                    updateDisplay();
+                }, 1000);
+            }
+            
+            updatePlayStopButton();
         }
 
         // Event listeners
@@ -429,7 +632,7 @@
                     exitEditMode();
                     // Auto-start the timer after editing
                     if (isTimer && elapsedTime > 0) {
-                        startBtn.click();
+                        playStopBtn.click();
                     }
                 } else if (e.key === 'Escape') {
                     e.preventDefault();
@@ -453,53 +656,7 @@
             }
         });
 
-        startBtn.addEventListener('click', () => {
-            exitEditMode();
-            
-            if (isTimer) {
-                if (elapsedTime <= 0) {
-                    alert('Please set a timer duration');
-                    return;
-                }
-            }
-            
-            if (!isRunning) {
-                isRunning = true;
-                interval = setInterval(() => {
-                    elapsedTime += isTimer ? -1000 : 1000;
-                    
-                    if (isTimer && elapsedTime <= 0) {
-                        elapsedTime = 0;
-                        clearInterval(interval);
-                        isRunning = false;
-                        
-                        // Flash the display
-                        let flashCount = 0;
-                        const flashInterval = setInterval(() => {
-                            display.style.color = display.style.color === 'red' ? '#333333' : 'red';
-                            flashCount++;
-                            if (flashCount >= 6) {
-                                clearInterval(flashInterval);
-                                display.style.color = '#333333';
-                            }
-                        }, 300);
-                    }
-                    
-                    updateDisplay();
-                }, 1000);
-            }
-            
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-        });
-
-        stopBtn.addEventListener('click', () => {
-            clearInterval(interval);
-            isRunning = false;
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-        });
-
+        playStopBtn.addEventListener('click', togglePlayStop);
         resetBtn.addEventListener('click', reset);
         timerBtn.addEventListener('click', setTimerMode);
         stopwatchBtn.addEventListener('click', setStopwatchMode);
@@ -510,6 +667,7 @@
 
         // Initialize
         updateDisplay();
+        updatePlayStopButton();
     </script>
 </body>
 </html>
